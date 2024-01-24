@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beam Analysis Input Form</title>
+    <link rel="stylesheet" href="{{ url_for('static',filename='style.css') }}" />
+    <script src="{{ url_for('static',filename='script.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.0.0/math.min.js"></script>
+  </head>
+  <body>
+    <form id="beamForm">
+      <h2>Beam Analysis Input</h2>
+
+      <!-- Number of Supports -->
+      <label for="numSupports">Number of Supports:</label>
+      <input type="number" id="numSupports" name="numSupports" required /><br />
+
+      <!-- Number of Internal Joints -->
+      <label for="numJoints">Number of Internal Joints:</label>
+      <input type="number" id="numJoints" name="numJoints" required /><br />
+      <hr />
+      <!-- Spans Information -->
+      <label for="numSpans">Number of Spans:</label>
+      <input type="number" id="numSpans" name="numSpans" required /><br />
+
+      <!-- Dynamic Span Information -->
+      <div id="spanDetails"></div>
+      <hr />
+
+      <!-- Settlement Information -->
+      <label for="settlement">Is there any settlement?</label>
+      <select id="settlement" name="settlement">
+        <option value="yes">Yes</option>
+        <option value="no" selected>No</option></select
+      ><br />
+      <div id="settlementDetails"></div>
+
+      <!-- Fixed Nodes Information -->
+      <label for="firstNodeFixed">Is the first node fixed?</label>
+      <select id="firstNodeFixed" name="firstNodeFixed">
+        <option value="yes">Yes</option>
+        <option value="no" selected>No</option></select
+      ><br />
+
+      <label for="lastNodeFixed">Is the last node fixed?</label>
+      <select id="lastNodeFixed" name="lastNodeFixed">
+        <option value="yes">Yes</option>
+        <option value="no" selected>No</option></select
+      ><br />
+
+      <button type="submit">Submit</button>
+    </form>
+
+
+  </body>
+</html>
