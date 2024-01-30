@@ -4,20 +4,23 @@ from utils import Span, Node
 
 
 
-def calculate_beam_properties(number_of_supports, number_of_internal_joints, span_data, settlement_positions, settlement_on_beam, first_node_fixed, last_node_fixed):
+def calculate_beam_properties(number_of_supports, number_of_internal_joints, span_data, settlement_positions, settlement_values, settlement_on_beam, first_node_fixed, last_node_fixed):
   number_of_nodes = number_of_supports + number_of_internal_joints
   number_of_spans = number_of_nodes - 1
 
-  beam_nodes = [Node() for _ in range(number_of_nodes)]
-  beam_spans = [Span(**data) for data in span_data]
+  print(number_of_nodes)
+
+  beam_nodes = []
+  beam_spans = []
 
   settlement_variable = 0
   angular_displacement_variable = 0
   equilibrium_equation_variable = ""
   node_reaction_variable = 0
   for i in range(number_of_nodes):
+      beam_nodes.append("")
       beam_nodes[i] = Node(settlement_variable, angular_displacement_variable, equilibrium_equation_variable,
-                          node_reaction_variable, **beam_nodes[i])
+                          node_reaction_variable)
 
   # make all the unknown angular displacements sympy symbols, and store them in a list, first and last are always = 0
   list_of_unknown_angular_displacements = []
@@ -50,11 +53,12 @@ def calculate_beam_properties(number_of_supports, number_of_internal_joints, spa
   span_a_value_variable = 1
 
   for i in range(number_of_spans):
-      beam_spans[i] = Span(left_fem_variable, right_fem_variable, span_length_variable, load_variable,
+    beam_spans.append("")
+    beam_spans[i] = Span(left_fem_variable, right_fem_variable, span_length_variable, load_variable,
                           loading_condition_variable, cord_rotation_variable, left_moment_variable,
                           right_moment_variable, left_slope_deflection_equation_variable,
                           right_slope_deflection_equation_variable, reaction_at_left_node_on_span_variable,
-                          reaction_at_right_node_on_span_variable, span_a_value_variable, **beam_spans[i])
+                          reaction_at_right_node_on_span_variable, span_a_value_variable)
 
   # the parameters needed for the FEM calculation are gotten from user
   # the fixed end moments are calculated based on the loading conditions
@@ -146,15 +150,14 @@ def calculate_beam_properties(number_of_supports, number_of_internal_joints, spa
   # next is to get the value of the support settlements
   # settlement_on_beam = input("Is there any settlement on the beam (yes) or (no)? ")
   if settlement_on_beam != "yes":
-      print("No settlement on beam")
-      for node in range(number_of_nodes):
-          beam_nodes[node].settlement = 0
+        for node in beam_nodes:
+            node.settlement = 0
   else:
-    for node in range(number_of_nodes):
-        if node in settlement_positions:
-            beam_nodes[i].settlement = int(input(f"value of settlement at position {node}?: "))
-        else:
-            beam_nodes[i].settlement = 0
+        for i, node in enumerate(beam_nodes):
+            if i in settlement_positions:
+                node.settlement = settlement_values[settlement_positions.index(i)]
+            else:
+                node.settlement = 0
 
   # next is to determine the value of the cord rotation for each span
   for i in range(number_of_spans):
@@ -439,8 +442,11 @@ def calculate_beam_properties(number_of_supports, number_of_internal_joints, spa
           position_along_beam.append(length_of_beam)
           sf += beam_nodes[i+1].node_reaction
           shear_forces.append(sf)
-  
-  return { "shear_forces": shear_forces, "position_along_beam": position_along_beam }
+
+  serializable_solution = {str(key): str(val) for key, val in solution.items()}
+  serializable_list_of_moments = [str(moment) for moment in list_of_end_moments]
+  serializable_equations =[str(equation) for equation in equations]
+  return { "shear_forces": shear_forces, "position_along_beam": position_along_beam, "equation": serializable_equations,  "equationSolution": serializable_solution, "listOfMoments": serializable_list_of_moments }
 
   '''
       elif beam_spans[i].loading_condition == "VDL_C":
